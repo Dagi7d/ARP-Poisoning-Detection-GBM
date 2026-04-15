@@ -1,0 +1,108 @@
+\documentclass[12pt]{article}
+
+% --- Preamble: Packages for CS Rigor ---
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{pgfgantt}
+\usepackage{hyperref}
+\usepackage{caption}
+
+\title{\textbf{Detecting Man-in-the-Middle (MitM) ARP Poisoning Attacks in Enterprise WLANs using Gradient Boosting Machines}}
+\author{Dagim Abate}
+\date{April 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The rapid expansion of enterprise wireless local area networks (WLANs) has introduced critical security vulnerabilities. Among these, Man-in-the-Middle (MitM) attacks via ARP poisoning remain a primary threat to data integrity \cite{ref1}. While traditional rule-based systems exist, they often fail to adapt to the stealthy nature of modern exploits \cite{ref2}. This research proposes an intelligent detection framework utilizing Gradient Boosting Machines (GBM) to provide real-time network protection.
+
+\section{Problem Statement}
+\textbf{Ideal:} In a secure enterprise WLAN environment, the Address Resolution Protocol (ARP) should maintain a verified mapping between IP and MAC addresses to ensure untampered data flow.
+
+\textbf{Reality:} However, the stateless nature of ARP allows attackers to broadcast malicious ARP replies, poisoning the cache of legitimate hosts. Current rule-based Intrusion Detection Systems (IDS) suffer from high false-positive rates and struggle to detect novel attack patterns in real-time \cite{ref2}.
+
+\textbf{Consequence:} If left unaddressed, these vulnerabilities lead to unauthorized packet sniffing, session hijacking, and significant damage to enterprise systems \cite{ref3}.
+
+\section{Objectives}
+\subsection{General Objective}
+To design and implement a high-performance detection model for MitM ARP poisoning attacks in enterprise WLANs using Gradient Boosting Machine learning techniques.
+
+\subsection{Specific Objectives}
+\begin{itemize}
+    \item To analyze and preprocess network traffic features from datasets such as RT-IoT2022.
+    \item To implement a Gradient Boosting-based detection model using XGBoost.
+    \item To evaluate model performance using accuracy, precision, recall, and F1-score.
+    \item To compare the proposed model with baseline algorithms such as Support Vector Machine (SVM).
+\end{itemize}
+
+\section{Literature Synthesis \& SOTA}
+Recent research highlights the use of machine learning techniques in detecting ARP poisoning and MitM attacks. Usmani et al. demonstrated the effectiveness of ML-based classification models but lacked real-time validation \cite{ref1}. Similarly, Saritakumar et al. proposed SDN-based detection approaches with high precision but increased computational overhead \cite{ref2}. 
+
+\textbf{Research Gap:} Existing solutions often fail to balance detection accuracy with real-time performance in enterprise WLAN environments. This research addresses this limitation by proposing a Gradient Boosting-based model optimized for both efficiency and accuracy.
+
+\subsection{Synthesis Matrix}
+\begin{table}[h]
+\centering
+\caption{Comparison of Existing Machine Learning Detection Methods}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Author (Year)} & \textbf{Method} & \textbf{Dataset} & \textbf{Metric} & \textbf{Limitation} \\
+\midrule
+Usmani (2022) & ML Classification & Network Traffic & Accuracy & No real-time validation \\
+Saritakumar (2023) & SDN Detection & SDN Dataset & Precision & High complexity \\
+Ahuja (2022) & Deep Learning & SDN Dataset & Accuracy & High computation cost \\
+Alani (2023) & Explainable DL & IoT Dataset & F1-score & Not WLAN optimized \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Technical Methodology}
+\subsection{System Architecture}
+The proposed system consists of the following components:
+
+\begin{itemize}
+    \item \textbf{Data Ingestion Layer:} Captures raw network traffic data.
+    \item \textbf{Feature Engineering Layer:} Extracts and processes relevant features.
+    \item \textbf{GBM Inference Layer:} Classifies traffic as normal or malicious.
+\end{itemize}
+
+\subsection{Tool Justification}
+\begin{itemize}
+    \item \textbf{XGBoost:} Selected for its efficiency, scalability, and high performance on structured datasets.
+    \item \textbf{Google Colab:} Provides a cloud-based environment with GPU support for model training.
+\end{itemize}
+
+\section{Timeline \& Ethics}
+
+\subsection{Project Timeline}
+\begin{center}
+\begin{ganttchart}[
+    vgrid, hgrid,
+    x unit=1.2cm,
+    y unit chart=0.7cm
+]{1}{5}
+    \gantttitle{Project Timeline (Months)}{5} \\
+    \gantttitlelist{1,...,5}{1} \\
+    \ganttbar{Literature Review}{1}{1} \\
+    \ganttbar{Data Preparation}{2}{2} \\
+    \ganttbar{Model Development}{3}{4} \\
+    \ganttbar{Evaluation}{5}{5}
+\end{ganttchart}
+\end{center}
+
+\subsection{Ethics}
+This research will utilize publicly available datasets and will not involve any personal or sensitive data. The study adheres to ethical guidelines, ensuring transparency, fairness, and compliance with data protection standards.
+
+\section{Project Links}
+\begin{itemize}
+    \item \textbf{GitHub Repository:} \href{https://github.com/Dagi7d/ARP-Poisoning-Detection-GBM}{https://github.com/Dagi7d/ARP-Poisoning-Detection-GBM}
+\end{itemize}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
