@@ -57,7 +57,7 @@ adversarial-ids-eat/
 ### Step 1 — Clone the Repository
 
 ```bash
-git clone https://github.com/[your-username]/adversarial-ids-eat.git
+git clone https://github.com/Dagi7d/ARP-Poisoning-Detection-GBM.git
 cd adversarial-ids-eat
 ```
 
@@ -166,10 +166,10 @@ bash run_all.sh
 
 ## Author
 
-**[Your Full Name]**  
+**Dagim Abate**  
 Department of Computer Science  
 Hawassa University Institute of Technology  
-📧 [your.email@student.hu.edu.et]
+📧 dagimabate4@gmail.com
 
 ---
 
