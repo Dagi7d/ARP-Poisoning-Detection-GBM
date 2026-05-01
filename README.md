@@ -1,16 +1,16 @@
-# Adversarial IDS — Ensemble Adversarial Training (EAT)
+# ARP Poisoning Detection using Gradient Boosting Machines
 
-> **Course:** Research Methods in Computer Science (CoSc3101)  
-> **Institution:** Hawassa University Institute of Technology  
-> **Department:** Computer Science, Year III Semester II — 2018/2026 A/Y  
-> **Advisor:** Mr. Birhane Bekele  
+> **Course:** Research Methods in Computer Science (CoSc3101)
+> **Institution:** Hawassa University Institute of Technology
+> **Department:** Computer Science, Year III Semester II — 2018/2026 A/Y
+> **Advisor:** Mr. Birhane Bekele
 > **Student:** Dagim Abate (ID: 1716/16)
 
 ---
 
 ## Abstract
 
-Deep learning-based Intrusion Detection Systems (DL-IDS) have become a cornerstone of modern cybersecurity infrastructure; however, they remain critically vulnerable to adversarial examples — carefully crafted perturbations that cause misclassification while remaining imperceptible to human analysts. This project investigates the robustness of DL-IDS models against white-box and black-box adversarial attacks and proposes an **Ensemble Adversarial Training (EAT)** framework that simultaneously hardens multiple neural architectures (CNN, LSTM, Autoencoder). Using the CICIDS2017 and NSL-KDD benchmark datasets, the study quantifies detection degradation under FGSM, PGD, and Carlini–Wagner attacks, then evaluates whether the proposed EAT strategy restores and exceeds baseline detection rates. Evaluation metrics include accuracy, F1-score, False Negative Rate (FNR), and Adversarial Robustness Score (ARS). This research addresses the absence of a unified, dataset-agnostic adversarial hardening approach for network intrusion detection and contributes a reproducible open-source framework for the cybersecurity community.
+Address Resolution Protocol (ARP) poisoning is one of the most prevalent Man-in-the-Middle (MitM) attack vectors in enterprise Wireless Local Area Networks (WLANs), enabling attackers to silently intercept, alter, or drop network traffic between legitimate hosts. Traditional rule-based and signature-driven ARP protection mechanisms fail against sophisticated, low-rate poisoning attempts that evade static detection thresholds. This proposal presents a machine learning approach to ARP poisoning detection using Gradient Boosting Machines (GBM), leveraging network flow-level features extracted from enterprise WLAN traffic. Using the CIC-IDS2017 and a custom-generated ARP poisoning dataset captured in a controlled lab environment, the study trains and evaluates XGBoost, LightGBM, and CatBoost classifiers, comparing their detection accuracy, precision, recall, F1-score, and false positive rate against baseline methods including Random Forest and SVM. The proposed GBM-based detection framework aims to achieve a detection accuracy exceeding 98% and a false positive rate below 2%, providing a practical, deployable solution for enterprise network administrators to detect MitM ARP poisoning attacks in real time.
 
 ---
 
@@ -42,7 +42,7 @@ ARP-Poisoning-Detection-GBM/
 git clone https://github.com/Dagi7d/ARP-Poisoning-Detection-GBM.git
 cd ARP-Poisoning-Detection-GBM
 
-# Compile the LaTeX document
+# Compile the LaTeX document (run 3 times for references to resolve)
 pdflatex main.tex
 bibtex main
 pdflatex main.tex
@@ -51,30 +51,41 @@ pdflatex main.tex
 
 ---
 
+## Research Overview
+
+| Item | Detail |
+|---|---|
+| **Topic** | MitM ARP Poisoning Detection in Enterprise WLANs |
+| **Approach** | Gradient Boosting Machines (XGBoost, LightGBM, CatBoost) |
+| **Datasets** | CIC-IDS2017 (IEEE DataPort) + Custom WLAN capture |
+| **Baselines** | Random Forest, SVM |
+| **Explainability** | SHAP feature importance analysis |
+
 ## Evaluation Metrics
 
 | Metric | Target |
 |---|---|
-| Accuracy | ≥ 95% (clean), ≥ 85% (adversarial) |
-| F1-score | ≥ 0.90 post-hardening |
-| False Negative Rate (FNR) | ≤ 0.08 |
-| Adversarial Robustness Score (ARS) | ≥ 0.85 |
+| Accuracy | ≥ 98% |
+| F1-score | ≥ 0.97 |
+| False Positive Rate (FPR) | ≤ 2% |
+| AUC-ROC | ≥ 0.99 |
 
 ---
 
 ## Ethics & Reproducibility
 
-- All datasets used (CICIDS2017, NSL-KDD) are publicly available benchmarks with no real user data.
-- Research complies with GDPR principles — no personal data is collected or processed.
-- Potential dataset bias is mitigated by evaluating on two independent benchmark datasets.
+- All datasets are publicly available benchmarks or lab-captured with no real user data.
+- Attack simulations performed exclusively on an isolated private testbed.
+- Research findings intended to assist network defenders only.
+- GDPR-compliant: no personal data collected or processed.
 
 ---
 
 ## Author
 
-**Dagim Abate**  
-Department of Computer Science  
-Hawassa University Institute of Technology  
+**Dagim Abate**
+Department of Computer Science
+Hawassa University Institute of Technology
 📧 dagimabate4@gmail.com
 
 ---
