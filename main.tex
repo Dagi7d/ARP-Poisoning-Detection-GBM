@@ -1,107 +1,475 @@
-\documentclass[12pt]{article}
+\documentclass[12pt,a4paper]{article}
 
-% --- Preamble: Packages for CS Rigor ---
-\usepackage[utf8]{inputenc}
+% ── Packages ──────────────────────────────────────────────────────────────────
 \usepackage[margin=1in]{geometry}
-\usepackage{graphicx}
+\usepackage{times}
+\usepackage{setspace}
+\usepackage{titlesec}
 \usepackage{booktabs}
-\usepackage{pgfgantt}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{pgfgantt}
+\usepackage{cite}
+\usepackage{fancyhdr}
+\usepackage{microtype}
 \usepackage{caption}
 
-\title{\textbf{Detecting Man-in-the-Middle (MitM) ARP Poisoning Attacks in Enterprise WLANs using Gradient Boosting Machines}}
-\author{Dagim Abate}
-\date{April 2026}
+% ── Hyperref setup ────────────────────────────────────────────────────────────
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black
+}
 
+% ── Header / Footer ───────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small CS Research Proposal --- CoSc3101}
+\lhead{\small Hawassa University Institute of Technology}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Section formatting ────────────────────────────────────────────────────────
+\titleformat{\section}{\large\bfseries\color{blue!80!black}}{}{0em}{\thesection\quad}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{\thesubsection\quad}
+\titlespacing*{\section}{0pt}{14pt}{6pt}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+
+% ══════════════════════════════════════════════════════════════════════════════
 \begin{document}
 
-\maketitle
+% ── Title Page ────────────────────────────────────────────────────────────────
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    {\Large \textbf{Hawassa University Institute of Technology}\\[4pt]
+    Faculty of Informatics --- Department of Computer Science}\\[0.5cm]
+    \rule{\linewidth}{0.5pt}\\[0.5cm]
+    {\LARGE \textbf{Detecting and Mitigating Adversarial Attacks\\
+    on Deep Learning-Based Intrusion Detection Systems\\
+    Using Ensemble Adversarial Training}}\\[0.5cm]
+    \rule{\linewidth}{0.5pt}\\[0.8cm]
+    {\large \textbf{Research Methods in Computer Science (CoSc3101)}\\[4pt]
+    CS Research Proposal --- Individual Project}\\[1cm]
+    \begin{tabular}{ll}
+        \textbf{Student Name:}   & Dagim Abate                \\[4pt]
+        \textbf{Student ID:}     & 1716/16                    \\[4pt]
+        \textbf{Program:}        & BSc Computer Science       \\[4pt]
+        \textbf{Year / Semester:}& Year III, Semester II      \\[4pt]
+        \textbf{Academic Year:}  & 2018/2026                  \\[4pt]
+        \textbf{Submission Date:}& April 28, 2026             \\[4pt]
+        \textbf{Advisor:}        & Mr.\ Birhane Bekele        \\
+    \end{tabular}\\[1.5cm]
+    \textit{Submitted in partial fulfillment of the requirements for\\
+    Research Methods in Computer Science (CoSc3101)}
+    \vfill
+    {\small Department of Computer Science, Hawassa University Institute of Technology, Ethiopia}
+\end{titlepage}
 
-\section{Introduction}
-The rapid expansion of enterprise wireless local area networks (WLANs) has introduced critical security vulnerabilities. Among these, Man-in-the-Middle (MitM) attacks via ARP poisoning remain a primary threat to data integrity \cite{ref1}. While traditional rule-based systems exist, they often fail to adapt to the stealthy nature of modern exploits \cite{ref2}. This research proposes an intelligent detection framework utilizing Gradient Boosting Machines (GBM) to provide real-time network protection.
+% ── Abstract ──────────────────────────────────────────────────────────────────
+\begin{abstract}
+\noindent
+Deep learning-based Intrusion Detection Systems (DL-IDS) have become a cornerstone
+of modern cybersecurity infrastructure; however, they remain critically vulnerable
+to adversarial examples---carefully crafted perturbations that cause misclassification
+while remaining imperceptible to human analysts. This proposal investigates the
+robustness of DL-IDS models against white-box and black-box adversarial attacks and
+proposes an \textit{Ensemble Adversarial Training (EAT)} framework that simultaneously
+hardens multiple neural architectures. Using the CICIDS2017 and NSL-KDD benchmark
+datasets, the study will quantify detection degradation under FGSM, PGD, and
+Carlini--Wagner attacks, then evaluate whether the proposed EAT strategy restores
+and exceeds baseline detection rates. Evaluation metrics include accuracy, F1-score,
+False Negative Rate (FNR), and adversarial robustness score. This research directly
+addresses a gap in the existing literature---the absence of a unified, dataset-agnostic
+adversarial hardening approach for network intrusion detection---and contributes
+a reproducible open-source framework for the cybersecurity community.
+\end{abstract}
 
-\section{Problem Statement}
-\textbf{Ideal:} In a secure enterprise WLAN environment, the Address Resolution Protocol (ARP) should maintain a verified mapping between IP and MAC addresses to ensure untampered data flow.
+\tableofcontents
+\newpage
 
-\textbf{Reality:} However, the stateless nature of ARP allows attackers to broadcast malicious ARP replies, poisoning the cache of legitimate hosts. Current rule-based Intrusion Detection Systems (IDS) suffer from high false-positive rates and struggle to detect novel attack patterns in real-time \cite{ref2}.
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Logical Foundation}
+% ══════════════════════════════════════════════════════════════════════════════
 
-\textbf{Consequence:} If left unaddressed, these vulnerabilities lead to unauthorized packet sniffing, session hijacking, and significant damage to enterprise systems \cite{ref3}.
+\subsection{Title}
 
-\section{Objectives}
-\subsection{General Objective}
-To design and implement a high-performance detection model for MitM ARP poisoning attacks in enterprise WLANs using Gradient Boosting Machine learning techniques.
+\textbf{Detecting and Mitigating Adversarial Attacks on Deep Learning-Based
+Intrusion Detection Systems Using Ensemble Adversarial Training}
 
-\subsection{Specific Objectives}
-\begin{itemize}
-    \item To analyze and preprocess network traffic features from datasets such as RT-IoT2022.
-    \item To implement a Gradient Boosting-based detection model using XGBoost.
-    \item To evaluate model performance using accuracy, precision, recall, and F1-score.
-    \item To compare the proposed model with baseline algorithms such as Support Vector Machine (SVM).
-\end{itemize}
+\subsection{Problem Statement}
 
-\section{Literature Synthesis \& SOTA}
-Recent research highlights the use of machine learning techniques in detecting ARP poisoning and MitM attacks. Usmani et al. demonstrated the effectiveness of ML-based classification models but lacked real-time validation \cite{ref1}. Similarly, Saritakumar et al. proposed SDN-based detection approaches with high precision but increased computational overhead \cite{ref2}. 
+\textbf{Ideal State.}
+In an ideal cybersecurity environment, Deep Learning-based Intrusion Detection Systems
+(DL-IDS) reliably detect malicious network traffic with high accuracy ($>$99\%),
+remain robust against evolving evasion strategies, and maintain low false-negative
+rates even when faced with deliberately obfuscated attack patterns.
 
-\textbf{Research Gap:} Existing solutions often fail to balance detection accuracy with real-time performance in enterprise WLAN environments. This research addresses this limitation by proposing a Gradient Boosting-based model optimized for both efficiency and accuracy.
+\textbf{Reality.}
+Current DL-IDS models---including convolutional neural networks (CNNs) and
+recurrent neural networks (RNNs)---are susceptible to adversarial examples.
+Studies show that FGSM-perturbed traffic samples can reduce detection accuracy
+from over 98\% to below 45\% in standard benchmark environments \cite{yang2022}.
+Despite the growing body of research on adversarial machine learning, existing
+hardening methods are typically evaluated in isolation on a single architecture and
+a single dataset, making their generalizability questionable for real-world
+heterogeneous networks.
+
+\textbf{Consequence.}
+Without robust adversarial defenses, attackers can systematically exploit the
+blind spots of deployed DL-IDS to infiltrate enterprise networks, exfiltrate
+sensitive data, and disrupt critical infrastructure---with the global average
+cost of a data breach reaching USD~4.45 million in 2023 \cite{ibm2023}.
+
+\subsection{Research Objectives}
+
+\textbf{General Objective.}
+To design, implement, and evaluate an Ensemble Adversarial Training (EAT) framework
+that improves the robustness of deep learning-based intrusion detection systems
+against both white-box and black-box adversarial attacks.
+
+\textbf{Specific SMART Objectives.}
+\begin{enumerate}[label=\textbf{SO\arabic*.}, leftmargin=*, itemsep=4pt]
+    \item \textbf{Quantify} the degradation in detection accuracy ($\Delta$Acc)
+          of three DL-IDS architectures (CNN, LSTM, and Autoencoder) under FGSM,
+          PGD, and Carlini--Wagner adversarial attacks on the CICIDS2017 dataset
+          by \textit{Week~6} of the project timeline.
+    \item \textbf{Implement} the proposed EAT framework by integrating adversarial
+          samples from at least two attack methods into the training pipeline of
+          each architecture and achieve a post-hardening F1-score $\geq 0.90$
+          on the NSL-KDD test set by \textit{Week~10}.
+    \item \textbf{Evaluate} and compare the EAT framework against three baseline
+          defense strategies (standard adversarial training, feature squeezing, and
+          input transformation) using accuracy, FNR, and adversarial robustness
+          score, and produce a reproducible open-source implementation on GitHub
+          by \textit{Week~14}.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Literature Synthesis and State of the Art}
+% ══════════════════════════════════════════════════════════════════════════════
 
 \subsection{Synthesis Matrix}
-\begin{table}[h]
+
+Table~\ref{tab:synthesis} summarizes five peer-reviewed works from IEEE Xplore,
+ACM Digital Library, and ScienceDirect (2022--2026).
+
+\begin{table}[ht]
 \centering
-\caption{Comparison of Existing Machine Learning Detection Methods}
-\begin{tabular}{lllll}
+\caption{Synthesis Matrix of Related Work (2022--2026)}
+\label{tab:synthesis}
+\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{>{\bfseries}p{2.2cm} p{2.5cm} p{2.2cm} p{2.2cm} p{3.2cm}}
 \toprule
-\textbf{Author (Year)} & \textbf{Method} & \textbf{Dataset} & \textbf{Metric} & \textbf{Limitation} \\
+\textbf{Author(s)} & \textbf{Method} & \textbf{Dataset} & \textbf{Metric} & \textbf{Limitation} \\
 \midrule
-Usmani (2022) & ML Classification & Network Traffic & Accuracy & No real-time validation \\
-Saritakumar (2023) & SDN Detection & SDN Dataset & Precision & High complexity \\
-Ahuja (2022) & Deep Learning & SDN Dataset & Accuracy & High computation cost \\
-Alani (2023) & Explainable DL & IoT Dataset & F1-score & Not WLAN optimized \\
+Yang et al.\ \cite{yang2022} &
+FGSM + LSTM-based IDS &
+CICIDS2017 &
+Accuracy, FPR &
+Only white-box attacks; single architecture evaluated \\
+
+Han et al.\ \cite{han2023} &
+GAN-based adversarial traffic generation &
+NSL-KDD &
+Detection rate, AUC &
+Generative model prone to mode collapse; no defense proposed \\
+
+Debicha et al.\ \cite{debicha2023} &
+Adversarial training with PGD &
+UNSW-NB15 &
+F1-score, FNR &
+Single-model defense; high computational cost; not tested on heterogeneous traffic \\
+
+Li et al.\ \cite{li2024} &
+Ensemble learning for IDS robustness &
+CIC-DDoS2019 &
+Precision, Recall &
+Ensemble not hardened against adversarial inputs; no adversarial training applied \\
+
+Sarhan et al.\ \cite{sarhan2022} &
+Feature-based transfer learning IDS &
+CICIDS2017, UNSW-NB15 &
+Accuracy, F1 &
+Transfer assumes similar feature distributions; adversarial robustness not evaluated \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
-\section{Technical Methodology}
-\subsection{System Architecture}
-The proposed system consists of the following components:
+\subsection{Synthesis and Research Gap (approx.\ 300 words)}
 
-\begin{itemize}
-    \item \textbf{Data Ingestion Layer:} Captures raw network traffic data.
-    \item \textbf{Feature Engineering Layer:} Extracts and processes relevant features.
-    \item \textbf{GBM Inference Layer:} Classifies traffic as normal or malicious.
-\end{itemize}
+The landscape of adversarial attacks on deep learning-based intrusion detection systems
+has evolved rapidly since 2022. Yang et al.\ \cite{yang2022} demonstrated that even
+a simple gradient-based perturbation (FGSM) can catastrophically reduce LSTM-IDS
+accuracy on CICIDS2017, confirming that the threat is not merely theoretical.
+Han et al.\ \cite{han2023} extended this line of inquiry by using Generative Adversarial
+Networks (GANs) to synthesize realistic malicious traffic variants; however, their work
+stops short of proposing a corresponding defense, leaving a critical gap between
+attack modeling and practical mitigation.
+
+On the defense side, Debicha et al.\ \cite{debicha2023} applied Projected Gradient
+Descent (PGD) adversarial training to a single-model IDS on UNSW-NB15 and reported
+meaningful improvements in F1-score. However, their approach is computationally
+expensive and inherently architecture-specific---a single hardened model provides
+no resilience if a different classifier is deployed in the same network. Li et al.\
+\cite{li2024} recognized the performance benefits of ensemble learning for IDS
+and demonstrated higher recall on DDoS datasets, yet their ensemble was not subjected
+to any adversarial perturbations, leaving its robustness entirely unknown.
+
+Sarhan et al.\ \cite{sarhan2022} proposed cross-dataset transfer learning for IDS
+feature generalization, which is promising for deployment diversity but does not
+address adversarial robustness at all.
+
+The synthesis reveals a clear and consistent gap: \textit{no existing study evaluates
+an adversarial hardening strategy that is simultaneously (a)~multi-architecture,
+(b)~multi-dataset, and (c)~compared against more than one baseline defense}.
+The proposed Ensemble Adversarial Training (EAT) framework directly addresses this
+gap by jointly training CNN, LSTM, and Autoencoder models with adversarial samples
+drawn from multiple attack methods and validating results on two independent benchmark
+datasets. This positions the study as a meaningful contribution to adversarially
+robust cybersecurity systems.
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Technical Methodology and Experimental Design}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\subsection{System Architecture}
+
+The proposed system follows a four-stage pipeline:
+
+\begin{enumerate}[label=\textbf{Stage~\arabic*:}, leftmargin=*, itemsep=4pt]
+    \item \textbf{Data Ingestion and Preprocessing.}
+          Raw network flow records from CICIDS2017 and NSL-KDD are ingested,
+          cleaned (null removal, label encoding), and normalized using
+          Min-Max scaling. Features are selected via mutual information ranking
+          to retain the top-40 most discriminative attributes.
+
+    \item \textbf{Adversarial Attack Generation.}
+          Three attack algorithms---FGSM, PGD, and Carlini--Wagner (C\&W)---are
+          applied to the preprocessed test set using the Adversarial Robustness
+          Toolbox (ART v1.16). Both white-box (full model access) and black-box
+          (transfer-based) attack scenarios are simulated.
+
+    \item \textbf{Ensemble Adversarial Training (EAT).}
+          Three base classifiers (CNN, LSTM, Autoencoder) are trained on an
+          augmented dataset comprising original samples plus adversarial samples
+          from FGSM and PGD. A soft-voting ensemble aggregates their output
+          probabilities. The training loop iterates adversarial sample generation
+          and retraining for up to five epochs of augmentation.
+
+    \item \textbf{Evaluation and Comparison.}
+          The hardened ensemble is benchmarked against three baselines
+          (standard adversarial training, feature squeezing, input transformation)
+          using a held-out test set. Results are reported per attack type and
+          per dataset.
+\end{enumerate}
 
 \subsection{Tool Justification}
-\begin{itemize}
-    \item \textbf{XGBoost:} Selected for its efficiency, scalability, and high performance on structured datasets.
-    \item \textbf{Google Colab:} Provides a cloud-based environment with GPU support for model training.
+
+\begin{itemize}[itemsep=4pt]
+    \item \textbf{Python 3.11 + PyTorch 2.2} --- Chosen over TensorFlow because
+          PyTorch's dynamic computation graph simplifies custom adversarial training
+          loops and is the dominant framework in adversarial ML research (used by
+          ART, CleverHans, and Foolbox).
+    \item \textbf{IBM Adversarial Robustness Toolbox (ART v1.16)} --- Framework-agnostic
+          library supporting FGSM, PGD, and C\&W out of the box with a consistent API;
+          preferred over CleverHans (less actively maintained) and Foolbox (fewer
+          white-box attack implementations).
+    \item \textbf{Scikit-learn 1.4} --- Used for preprocessing pipelines, feature
+          selection (mutual information), and baseline classifier comparison.
+    \item \textbf{Weights \& Biases (WandB)} --- Experiment tracking and hyperparameter
+          logging, enabling fully reproducible runs linked to the GitHub repository.
+    \item \textbf{Jupyter Notebook} --- Provides a literate programming environment
+          for incremental development; final scripts are exported to \texttt{.py}
+          files for reproducibility.
 \end{itemize}
 
-\section{Timeline \& Ethics}
+\subsection{Data Strategy}
 
-\subsection{Project Timeline}
-\begin{center}
+\textbf{Datasets:}
+\begin{itemize}[itemsep=2pt]
+    \item \textbf{CICIDS2017} (Canadian Institute for Cybersecurity) --- 2.8~million
+          records, 78 features, covering seven attack categories (DoS, DDoS, Brute
+          Force, Infiltration, etc.). Available on IEEE DataPort and the CIC website.
+    \item \textbf{NSL-KDD} (UCI Machine Learning Repository) --- 125,973 training
+          records, 41 features, four attack classes. A cleaned successor to KDD Cup 99
+          with no duplicate records.
+\end{itemize}
+
+\textbf{Preprocessing Steps:}
+\begin{enumerate}[itemsep=2pt]
+    \item Remove records with infinite or NaN values.
+    \item Encode categorical labels (attack type) as integers.
+    \item Apply Min-Max normalization to all numerical features ($[0,1]$ range).
+    \item Select top-40 features using mutual information with respect to the label.
+    \item Split into 70\% training, 15\% validation, 15\% test (stratified by class).
+    \item Generate adversarial augmentations only on the training split to prevent
+          data leakage.
+\end{enumerate}
+
+\subsection{Evaluation Metrics}
+
+The following metrics will be used to evaluate model performance:
+
+\begin{align}
+    \text{Accuracy} &= \frac{TP + TN}{TP + TN + FP + FN} \\[6pt]
+    \text{F1-score} &= \frac{2 \cdot \text{Precision} \cdot \text{Recall}}
+                           {\text{Precision} + \text{Recall}} \\[6pt]
+    \text{False Negative Rate (FNR)} &= \frac{FN}{FN + TP} \\[6pt]
+    \text{Adversarial Robustness Score (ARS)} &= 1 - \frac{\text{Acc}_{\text{clean}} -
+                                               \text{Acc}_{\text{adv}}}
+                                               {\text{Acc}_{\text{clean}}}
+\end{align}
+
+Success is defined as: post-hardening F1-score $\geq 0.90$, FNR $\leq 0.08$,
+and ARS $\geq 0.85$ on both benchmark datasets.
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Project Management and Ethics}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\subsection{Timeline --- Gantt Chart}
+
+Figure~\ref{fig:gantt} shows the project timeline across 16 weeks (four phases).
+
+\begin{figure}[ht]
+\centering
+\caption{Project Gantt Chart}
+\label{fig:gantt}
 \begin{ganttchart}[
-    vgrid, hgrid,
-    x unit=1.2cm,
-    y unit chart=0.7cm
-]{1}{5}
-    \gantttitle{Project Timeline (Months)}{5} \\
-    \gantttitlelist{1,...,5}{1} \\
-    \ganttbar{Literature Review}{1}{1} \\
-    \ganttbar{Data Preparation}{2}{2} \\
-    \ganttbar{Model Development}{3}{4} \\
-    \ganttbar{Evaluation}{5}{5}
+    hgrid,
+    vgrid={*{6}{draw=none}, dotted},
+    x unit=0.62cm,
+    y unit title=0.55cm,
+    y unit chart=0.52cm,
+    title label font=\scriptsize,
+    bar label font=\scriptsize,
+    group label font=\small\bfseries,
+    bar/.style={fill=blue!50, rounded corners=2pt},
+    group/.style={fill=blue!80!black},
+    milestone/.style={fill=red, rounded corners=2pt},
+    bar height=0.5,
+    title height=1
+]{1}{16}
+    \gantttitle{Project Timeline (Weeks)}{16} \\
+    \gantttitlelist{1,...,16}{1} \\
+
+    \ganttgroup{Phase 1: Literature Review}{1}{4} \\
+    \ganttbar{Literature search \& reading}{1}{3} \\
+    \ganttbar{Synthesis matrix construction}{3}{4} \\
+
+    \ganttgroup{Phase 2: Data \& Setup}{4}{7} \\
+    \ganttbar{Dataset acquisition \& cleaning}{4}{5} \\
+    \ganttbar{Environment setup (PyTorch, ART)}{5}{6} \\
+    \ganttbar{Baseline model implementation}{6}{7} \\
+
+    \ganttgroup{Phase 3: Experiments}{7}{12} \\
+    \ganttbar{Adversarial attack generation}{7}{9} \\
+    \ganttbar{EAT framework implementation}{9}{11} \\
+    \ganttbar{Baseline defense comparison}{11}{12} \\
+
+    \ganttgroup{Phase 4: Evaluation \& Writing}{12}{16} \\
+    \ganttbar{Results analysis \& visualization}{12}{13} \\
+    \ganttbar{Final report \& GitHub cleanup}{13}{15} \\
+    \ganttbar{Submission preparation}{15}{16} \\
+    \ganttmilestone{Final Submission}{16}
 \end{ganttchart}
-\end{center}
+\end{figure}
 
-\subsection{Ethics}
-This research will utilize publicly available datasets and will not involve any personal or sensitive data. The study adheres to ethical guidelines, ensuring transparency, fairness, and compliance with data protection standards.
+\subsection{Ethical Considerations}
 
-\section{Project Links}
-\begin{itemize}
-    \item \textbf{GitHub Repository:} \href{https://github.com/Dagi7d/ARP-Poisoning-Detection-GBM}{https://github.com/Dagi7d/ARP-Poisoning-Detection-GBM}
-\end{itemize}
+\textbf{Data Privacy (GDPR Compliance).}
+Both CICIDS2017 and NSL-KDD are publicly available benchmark datasets derived
+from simulated network environments. They contain no real user identities, personal
+communications, or private IP addresses traceable to individuals. As such, the
+research does not involve the collection of personal data and is not subject to
+GDPR consent requirements. However, any future deployment of the proposed IDS
+in a live network must comply with GDPR Article~6 (lawfulness of processing) and
+Article~32 (security of processing), particularly regarding the logging of user
+traffic data.
 
+\textbf{Algorithmic Bias.}
+The training datasets were collected from controlled laboratory environments and
+may not represent the full diversity of real-world network traffic (e.g., traffic
+from IoT-dense African networks may differ significantly from North American campus
+traffic). Models trained solely on CICIDS2017 may exhibit lower recall on traffic
+patterns not represented in that dataset. To mitigate this, the study uses two
+independent datasets and reports per-class F1-scores to surface any class-level
+bias.
+
+\textbf{Environmental Impact.}
+Deep learning training is energy-intensive. All experiments will be run on a single
+GPU (NVIDIA RTX 3060, 12~GB VRAM) with early stopping enabled to minimize unnecessary
+computation. Estimated energy consumption will be reported in the final paper using
+the \texttt{codecarbon} library, promoting transparency around the environmental
+cost of the research.
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Version Control and Documentation}
+% ══════════════════════════════════════════════════════════════════════════════
+
+\subsection{GitHub Repository}
+
+The project repository is hosted publicly at:\\
+\url{https://github.com/Dagi7d/ARP-Poisoning-Detection-GBM}
+
+\textbf{Repository Structure:}
+\begin{verbatim}
+ARP-Poisoning-Detection-GBM/
+├── README.md
+├── main.tex
+└── references.bib
+\end{verbatim}
+
+\subsection{README.md Contents}
+
+The \texttt{README.md} will include:
+\begin{enumerate}[itemsep=2pt]
+    \item An abstract of the research proposal (mirroring the abstract above).
+    \item Step-by-step installation instructions for all dependencies.
+    \item Instructions to download and place datasets in \texttt{data/raw/}.
+    \item Commands to reproduce all experiments.
+\end{enumerate}
+
+Sample installation block (to appear in README):
+\begin{verbatim}
+# Clone the repository
+git clone https://github.com/Dagi7d/ARP-Poisoning-Detection-GBM.git
+cd adversarial-ids-eat
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run baseline evaluation
+python src/models/cnn_ids.py --dataset cicids2017
+
+# Run EAT framework
+python src/eat_framework.py --attack fgsm pgd --epochs 5
+\end{verbatim}
+
+\subsection{BibTeX}
+
+All references are managed in \texttt{references.bib} using BibTeX. No manual
+bibliography entries are used. Citations in this document are generated with
+the \texttt{cite} package and the \texttt{IEEEtran} bibliography style.
+
+% ── References ────────────────────────────────────────────────────────────────
+\newpage
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
